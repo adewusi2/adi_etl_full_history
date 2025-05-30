@@ -1,0 +1,63 @@
+import sqlite3
+import pandas as pd
+
+DB_PATH = "data/stocks.db"
+TABLE_NAME = "adi_stock"
+
+# Define your top 10 SQL queries as (description, query) tuples
+QUERIES = [
+    ("1. Latest 10 records",
+     f"SELECT * FROM {TABLE_NAME} ORDER BY Date DESC LIMIT 10;"),
+
+    ("2. Highest closing prices (top 10)",
+     f"SELECT Date, Close FROM {TABLE_NAME} ORDER BY Close DESC LIMIT 10;"),
+
+    ("3. Lowest closing prices (top 10)",
+     f"SELECT Date, Close FROM {TABLE_NAME} ORDER BY Close ASC LIMIT 10;"),
+
+    ("4. Average closing price",
+     f"SELECT AVG(Close) as avg_close FROM {TABLE_NAME};"),
+
+    ("5. Max and min closing price",
+     f"SELECT MAX(Close) as max_close, MIN(Close) as min_close FROM {TABLE_NAME};"),
+
+    ("6. Total volume traded per year",
+     f\"\"\"
+     SELECT STRFTIME('%Y', Date) as Year, SUM(Volume) as TotalVolume
+     FROM {TABLE_NAME}
+     GROUP BY Year ORDER BY Year;
+     \"\"\"),
+
+    ("7. Days with volume greater than 5 million (top 10)",
+     f"SELECT Date, Volume FROM {TABLE_NAME} WHERE Volume > 5000000 ORDER BY Volume DESC LIMIT 10;"),
+
+    ("8. Closing price trend for last 30 days",
+     f"SELECT Date, Close FROM {TABLE_NAME} ORDER BY Date DESC LIMIT 30;"),
+
+    ("9. Number of trading days per year",
+     f\"\"\"
+     SELECT STRFTIME('%Y', Date) as Year, COUNT(*) as TradingDays
+     FROM {TABLE_NAME}
+     GROUP BY Year ORDER BY Year;
+     \"\"\"),
+
+    ("10. Price range (High - Low) average per year",
+     f\"\"\"
+     SELECT STRFTIME('%Y', Date) as Year, AVG(High - Low) as AvgPriceRange
+     FROM {TABLE_NAME}
+     GROUP BY Year ORDER BY Year;
+     \"\"\")
+]
+
+def run_queries(db_path):
+    conn = sqlite3.connect(db_path)
+    for desc, query in QUERIES:
+        print(f"\n=== {desc} ===")
+        df = pd.read_sql(query, conn)
+        print(df)
+    conn.close()
+
+if __name__ == "__main__":
+    print(f"Connecting to database: {DB_PATH}")
+    run_queries(DB_PATH)
+    print("\n✅ All queries executed.")
