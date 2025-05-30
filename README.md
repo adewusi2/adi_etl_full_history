@@ -11,6 +11,3 @@ It also automates daily updates and provides tools for analysis and visualizatio
 - Automate daily incremental updates.
 - Basic data visualization using matplotlib.
 - Sample SQL queries for common stock analysis.
-
-## Project Structure
-
